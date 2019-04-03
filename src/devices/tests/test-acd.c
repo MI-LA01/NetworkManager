@@ -71,6 +71,12 @@ _skip_acd_test_check (void)
 		_skip; \
 	})
 
+static gboolean
+_skip_acd_bpf (void)
+{
+	return FALSE;
+}
+
 /*****************************************************************************/
 
 typedef struct {
@@ -152,6 +158,11 @@ again:
 	}
 
 	r = nm_acd_manager_start_probe (manager, wait_time);
+	if (r == -EPERM) {
+		g_assert (_skip_acd_bpf ());
+		g_test_skip ("nm_acd_manager_start_probe() failed with EPERM");
+		return;
+	}
 	g_assert_cmpint (r, ==, 0);
 
 	g_assert (nmtst_main_loop_run (loop, 2000));
@@ -219,6 +230,11 @@ test_acd_announce (test_fixture *fixture, gconstpointer user_data)
 
 	loop = g_main_loop_new (NULL, FALSE);
 	r = nm_acd_manager_announce_addresses (manager);
+	if (r == -EPERM) {
+		g_assert (_skip_acd_bpf ());
+		g_test_skip ("nm_acd_manager_announce_addresses() failed with EPERM");
+		return;
+	}
 	g_assert_cmpint (r, ==, 0);
 	g_assert (!nmtst_main_loop_run (loop, 200));
 }
