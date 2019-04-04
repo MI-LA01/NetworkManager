@@ -203,9 +203,10 @@ nm_vpn_openconnect_authenticate_helper (const char *host,
                                         int *status,
                                         GError **error)
 {
-	char *output = NULL;
+	gs_free char *output = NULL;
 	gboolean ret;
-	char **strv = NULL, **iter;
+	gs_strfreev char **strv = NULL;
+	char **iter;
 	char *argv[4];
 	const char *path;
 	const char *const DEFAULT_PATHS[] = {
@@ -248,7 +249,6 @@ nm_vpn_openconnect_authenticate_helper (const char *host,
 		_extract_variable_value (*iter, "HOST=", gateway);
 		_extract_variable_value (*iter, "FINGERPRINT=", gwcert);
 	}
-	g_strfreev (strv);
 
 	return TRUE;
 }
