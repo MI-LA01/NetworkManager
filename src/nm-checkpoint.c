@@ -260,6 +260,12 @@ restore_and_activate_connection (NMCheckpoint *self,
 		need_activation = TRUE;
 	}
 
+	if (!dev_checkpoint->device) {
+		nm_assert (dev_checkpoint->is_software);
+		_LOGD ("rollback: software device cannot be restored");
+		return FALSE;
+	}
+
 	if (need_activation) {
 		_LOGD ("rollback: reactivating connection %s",
 		       nm_settings_connection_get_uuid (connection));
