@@ -19,7 +19,14 @@ stages:
   stage: test
   script:
     - date '+%Y%m%d-%H%M%S'; uname -a
+    - date '+%Y%m%d-%H%M%S'; dnf -y install strace
     - date '+%Y%m%d-%H%M%S'; dnf list --installed
+    - date '+%Y%m%d-%H%M%S'; git clean -fdx
+    - date '+%Y%m%d-%H%M%S'; ./autogen.sh
+    - date '+%Y%m%d-%H%M%S'; make -j 10 src/devices/tests/test-acd
+    - date '+%Y%m%d-%H%M%S'; ./tools/run-nm-test.sh -m src/devices/tests/test-acd || true
+    - date '+%Y%m%d-%H%M%S'; strace -s 10000 -f src/devices/tests/test-acd
+    - date '+%Y%m%d-%H%M%S'; ./tools/run-nm-test.sh -m src/devices/tests/test-acd
     - date '+%Y%m%d-%H%M%S'; git clean -fdx ; CI=gitlab BUILD_TYPE=autotools CC=gcc   WITH_DOCS=1 contrib/scripts/nm-ci-run.sh
     - date '+%Y%m%d-%H%M%S'; rm -rf /tmp/nm-docs-html; mv build/INST/share/gtk-doc/html /tmp/nm-docs-html
     - date '+%Y%m%d-%H%M%S'; git clean -fdx ; CI=gitlab BUILD_TYPE=meson     CC=gcc   WITH_DOCS=1 contrib/scripts/nm-ci-run.sh

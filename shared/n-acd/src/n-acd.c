@@ -3,6 +3,7 @@
  */
 
 #include <assert.h>
+#include <stdio.h>
 #include <c-list.h>
 #include <c-rbtree.h>
 #include <c-siphash.h>
@@ -230,6 +231,7 @@ _public_ int n_acd_new(NAcd **acdp, NAcdConfig *config) {
         _cleanup_(n_acd_closep) int fd_bpf_prog = -1;
         int r;
 
+        printf (">>>nacd: n_acd_new() start\n");
         if (config->ifindex <= 0 ||
             config->transport != N_ACD_TRANSPORT_ETHERNET ||
             config->n_mac != ETH_ALEN ||
@@ -245,24 +247,29 @@ _public_ int n_acd_new(NAcd **acdp, NAcdConfig *config) {
         memcpy(acd->mac, config->mac, ETH_ALEN);
 
         r = n_acd_get_random(&acd->seed);
+        printf (">>>nacd: get-random=%d\n", r);
         if (r)
                 return r;
 
         acd->fd_epoll = epoll_create1(EPOLL_CLOEXEC);
+        printf (">>>nacd: epoll_create %s\n", acd->fd_epoll < 0 ? "failed" : "succeeded");
         if (acd->fd_epoll < 0)
                 return -n_acd_errno();
 
         r = timer_init(&acd->timer);
+        printf (">>>nacd: timer-init=%d\n", r);
         if (r < 0)
                 return r;
 
         acd->max_bpf_map = 8;
 
         r = n_acd_bpf_map_create(&acd->fd_bpf_map, acd->max_bpf_map);
+        printf (">>>nacd: call n_acd_bpf_map_create(): %d\n", r);
         if (r)
                 return r;
 
         r = n_acd_bpf_compile(&fd_bpf_prog, acd->fd_bpf_map, (struct ether_addr*) acd->mac);
+        printf (">>>nacd: call n_acd_bpf_compile(): %d\n", r);
         if (r)
                 return r;
 
@@ -286,6 +293,7 @@ _public_ int n_acd_new(NAcd **acdp, NAcdConfig *config) {
         if (r < 0)
                 return -n_acd_errno();
 
+        printf (">>>nacd: created successfully\n");
         *acdp = acd;
         acd = NULL;
         return 0;
