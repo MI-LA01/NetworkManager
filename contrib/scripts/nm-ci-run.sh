@@ -98,8 +98,6 @@ run_autotools() {
             --enable-tests=yes \
             --with-crypto=$_WITH_CRYPTO \
             \
-            --with-ebpf=no \
-            \
             --with-libnm-glib=yes \
             --with-iwd=yes \
             --with-ofono=yes \
@@ -168,8 +166,6 @@ run_meson() {
         -D qt=false \
         -D crypto=$_WITH_CRYPTO \
         -D docs=$_WITH_DOCS \
-        \
-        -D ebpf=false \
         \
         -D libnm_glib=true \
         -D iwd=true \
